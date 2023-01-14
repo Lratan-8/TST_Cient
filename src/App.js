@@ -8,6 +8,7 @@ import SignUp from "./pages/Signup";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Homepage from "./pages/Homepage";
 import { CssBaseline } from "@mui/material";
+import LoginLogout from "./components/LoginLogout";
 
 function App() {
   const theme = createTheme({
@@ -21,8 +22,7 @@ function App() {
       <Layout />
       <div className='App'>
         <Routes>
-          <Route exact path='/login' element={<SignIn />} />
-          <Route exact path='/signup' element={<SignUp />} />
+          <Route exact path='/' element={<LoginLogout />} />
         </Routes>
       </div>
     </ThemeProvider>
