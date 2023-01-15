@@ -18,7 +18,7 @@ export default function LoginLogout() {
 
   return (
     <Container sx={{ marginTop: "20px" }}>
-      <Paper elevation={20}>
+      <Paper sx={{ height: "85vh" }} elevation={20}>
         <div
           style={{
             display: "flex",
