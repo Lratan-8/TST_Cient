@@ -1,32 +1,88 @@
 /** @format */
 
-import * as React from "react";
+import React, { Fragment, useState } from "react";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import PopupSnackbar from "../components/PopupSnackbar";
+import { LoadingButton } from "@mui/lab";
+import axios from "axios";
+import { useNavigate } from "react-router";
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
+
+  //to set loading when the async function is loading
+  const [loading, setLoading] = useState(false);
+
+  //to set the snackbar functionalities
+  const [snackBar, setsnackBar] = useState({
+    open: false,
+  })
+
+  const handleClick = () => {
+    setsnackBar({ open: true });
+  };
+
+
+  //to handle the user form data from the sign up form
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
+
     const data = new FormData(event.currentTarget);
-    console.log({
+    const dataF = {
+      name: data.get("name"),
+      phone: data.get("phone"),
       email: data.get("email"),
       password: data.get("password"),
-    });
+      confirmPassword: data.get("confirmPassword")
+    }
+
+
+    if (!dataF.name || !dataF.phone || !dataF.email || !dataF.password || !dataF.confirmPassword) {
+      console.log(dataF)
+      setsnackBar({ open: true, message: "Please fill all the fields", severity: "warning" });
+      setLoading(false)
+      return
+    }
+    if (dataF.password !== dataF.confirmPassword) {
+      console.log(dataF)
+      setsnackBar({ open: true, message: "Password and confirm password does not match", severity: "error" });
+      setLoading(false);
+      return
+    }
+
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        }
+      };
+      const responseData = await axios.post("/api/auth/createuser", dataF, config);
+
+      setsnackBar({ open: true, message: "Registration Successfull", severity: "success" });
+      localStorage.setItem('UserInfo', JSON.stringify(responseData));
+      console.log(responseData)
+      setLoading(false);
+      return
+    } catch (error) {
+      setsnackBar({ open: true, message: "we have an error", severity: "error" });
+      setLoading(false)
+      return
+    }
   };
 
   return (
     <Container component='main' maxWidth='xs'>
       <CssBaseline />
+      <PopupSnackbar obj={snackBar} close={setsnackBar} />
       <Box
         sx={{
           display: "flex",
@@ -45,11 +101,11 @@ export default function SignUp() {
             <Grid item xs={12} sm={6}>
               <TextField
                 autoComplete='given-name'
-                name='firstName'
+                name='name'
                 required
                 fullWidth
-                id='firstName'
-                label='First Name'
+                id='name'
+                label='Name'
                 autoFocus
               />
             </Grid>
@@ -57,10 +113,10 @@ export default function SignUp() {
               <TextField
                 required
                 fullWidth
-                id='lastName'
-                label='Last Name'
-                name='lastName'
-                autoComplete='family-name'
+                id='phone'
+                label='Phone Number'
+                name='phone'
+                autoComplete='your-phone-number'
               />
             </Grid>
             <Grid item xs={12}>
@@ -85,26 +141,35 @@ export default function SignUp() {
               />
             </Grid>
             <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                name='confirmPassword'
+                label='Confirm Password'
+                type='confirmPassword'
+                id='confirmPassword'
+                autoComplete='new-password'
+              />
+            </Grid>
+            <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox value='allowExtraEmails' color='primary' />}
                 label='I want to receive inspiration, marketing promotions and updates via email.'
               />
             </Grid>
           </Grid>
-          <Button
-            type='submit'
+          <LoadingButton
+            type="submit"
             fullWidth
-            variant='contained'
-            sx={{ mt: 3, mb: 2 }}>
-            Sign Up
-          </Button>
-          <Grid container justifyContent='flex-end'>
-            <Grid item>
-              <Link href='#' variant='body2'>
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
+            sx={{ mt: 3, mb: 2 }}
+            onClick={handleClick}
+            loading={loading}
+            variant="contained"
+          >
+            Sign up
+
+          </LoadingButton>
+
         </Box>
       </Box>
     </Container>
