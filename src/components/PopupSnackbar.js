@@ -15,7 +15,7 @@ const PopupSnackbar = (props) => {
         autoHideDuration={5000}
         onClose={close}
       >
-        <Alert severity={props.obj.severity} sx={{ width: '100%' }}>
+        <Alert onClose={close} severity={props.obj.severity} sx={{ width: '100%' }}>
           {props.obj.message}
 
         </Alert>
